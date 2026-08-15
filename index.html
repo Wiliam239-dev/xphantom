@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>XPHANTOM — Bot Management System</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- CINEMATIC LOADING OVERLAY -->
+<div id="cinematicLoading" class="cinematic-overlay hidden">
+  <div class="cinematic-video-wrap">
+    <video id="loadingVideo" class="cinematic-video" autoplay muted playsinline>
+      <source src="https://ar-hosting.pages.dev/1775202365165.mp4" type="video/mp4">
+    </video>
+    <div class="cinematic-glow"></div>
+    <div class="cinematic-skip-btn" id="skipLoadingBtn"><span>⟳ SKIP TO DASHBOARD</span></div>
+    <div class="cinematic-text">INITIALIZING XPHANTOM...</div>
+  </div>
+</div>
+
+<!-- GLOBAL LOADER -->
+<div id="loader" class="hidden">
+  <div class="uv-loader">
+    <div class="box1"></div><div class="box2"></div><div class="box3"></div>
+  </div>
+  <div class="loader-label">[ SYNCHRONIZING ]</div>
+</div>
+
+<div id="toastContainer"></div>
+
+<!-- Mobile overlay & hamburger -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<button class="hamburger" id="hamburgerBtn" onclick="openSidebar()">☰</button>
+
+<!-- ══════════════════════════════════════════════════════
+     LOGIN SECTION
+══════════════════════════════════════════════════════ -->
+<section id="loginSection">
+  <div class="login-video-bg">
+    <video autoplay loop muted playsinline class="bg-video">
+      <source src="https://ar-hosting.pages.dev/1775201520844.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay-gradient"></div>
+  </div>
+
+  <div class="login-wrapper">
+    <div class="login-logo">
+      <div class="logo-glow-wrap">
+        <img src="https://ar-hosting.pages.dev/1775201875305.jpg" alt="Owner Avatar" class="owner-avatar-img">
+      </div>
+      <h1 id="loginSiteName">XPHANTOM</h1>
+      <p id="loginTagline">TELEGRAM BOT VAULT</p>
+    </div>
+
+    <div id="loginBox">
+      <div class="scan-line"></div>
+      <div id="sandboxBadge" class="login-sandbox-badge" style="display:none">
+        <span class="badge-dot"></span> SANDBOX MODE
+      </div>
+      <div id="sandboxHint" class="sandbox-hint" style="display:none">
+        🧪 Demo credentials inside config
+      </div>
+      <div class="field-group">
+        <div class="field-label"><span class="li">◈</span> USERNAME</div>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input id="inputUsername" type="text" placeholder="identity" autocomplete="username"/>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label"><span class="li">◈</span> PASSWORD</div>
+        <div class="field-wrap">
+          <span class="field-icon">🔑</span>
+          <input id="inputPassword" type="password" placeholder="••••••" autocomplete="current-password"/>
+        </div>
+      </div>
+      <button class="btn-login" id="loginBtn" onclick="handleLogin()">
+        <span>▶ ACCESS TERMINAL</span>
+      </button>
+    </div>
+
+    <p class="login-footer">v<span id="siteVersion">1.0.0</span> · GITHUB DRIVEN · XPHANTOM CORE</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     DASHBOARD SECTION
+     NOTE: starts hidden — App.showDashboard() removes .hidden
+══════════════════════════════════════════════════════ -->
+<div id="dashboardSection" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand" id="sidebarBrand">◈ XPHANTOM</div>
+      <div class="sidebar-tagline" id="sidebarTagline">bot control XPHANTOM</div>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" id="userAvatarContainer">
+        <img id="userAvatarImg" class="avatar-img" src="" alt="avatar">
+      </div>
+      <div style="overflow:hidden;flex:1">
+        <div class="user-card-name" id="userDisplayName">—</div>
+        <span class="role-badge" id="userRoleBadge">ROLE</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">CORE</div>
+      <button class="nav-item active" data-tab="thanks" onclick="switchTab('thanks')">
+        <span class="nav-icon">🙏</span><span class="nav-text">Sanctuary</span>
+      </button>
+      <button class="nav-item" data-tab="tokens" onclick="switchTab('tokens')">
+        <span class="nav-icon">🔑</span><span class="nav-text">Token Armory</span>
+      </button>
+    </div>
+
+    <div class="nav-section hidden" id="devMenu">
+      <div class="nav-section-label">DEVELOPER REALM</div>
+      <button class="nav-item" data-tab="users" onclick="switchTab('users')">
+        <span class="nav-icon">👥</span><span class="nav-text">User Genesis</span>
+      </button>
+      <button class="nav-item" data-tab="overview" onclick="switchTab('overview')">
+        <span class="nav-icon">📊</span><span class="nav-text">Omniview</span>
+      </button>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="theme-row">
+        <span class="theme-label"><span id="themeIconLabel">🌙</span> CHROMA</span>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="themeToggle"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <button class="btn-logout" onclick="App.logout()"><span>⏻</span> DISCONNECT</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div id="dashSandboxBadge" class="sandbox-indicator hidden">
+      <span>🧪</span> SANDBOX MODE — VISUAL SIMULATION
+    </div>
+
+    <!-- THANKS TAB -->
+    <div class="tab-content active-tab" id="tab-thanks">
+      <div class="page-header">
+        <div class="page-title">🙏 ETERNAL GRATITUDE</div>
+        <div class="page-subtitle">contributors &amp; legends</div>
+      </div>
+      <div class="thanks-header">
+        <span class="thanks-header-icon">✨</span>
+        <div class="thanks-header-title"XPHANTOM CIRCLE</div>
+        <div class="thanks-header-sub">honoring the architects</div>
+      </div>
+      <div class="creator-card">
+        <div class="creator-card-inner">
+          <div class="creator-avatar">👑</div>
+          <div class="creator-info">
+            <div class="creator-name">FANZID OFFICIAL</div>
+            <div class="creator-title">System Architect / Creator</div>
+          </div>
+          <div class="creator-badge">⚡ CREATOR</div>
+        </div>
+      </div>
+      <div class="thanks-grid" id="thanksGrid"></div>
+    </div>
+
+    <!-- TOKEN TAB -->
+    <div class="tab-content" id="tab-tokens">
+      <div class="page-header">
+        <div class="page-title">🔑 TOKEN VAULT</div>
+        <div class="page-subtitle">manage bot credentials</div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">◈ INJECT NEW TOKEN</div>
+        <div class="input-row">
+          <input id="tokenInput" class="token-field" type="text"
+                 placeholder="1234567890:AAHhKt..."
+                 onkeydown="if(event.key==='Enter') App.addToken(this.value)"/>
+          <button class="btn-12" onclick="App.addToken(document.getElementById('tokenInput').value)">＋ DEPLOY</button>
+        </div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">◈ ACTIVE TOKENS</div>
+        <div id="tokenList"><div class="empty-state">[ no tokens detected ]</div></div>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div class="tab-content" id="tab-users">
+      <div class="page-header">
+        <div class="page-title">👥 USER GENESIS</div>
+        <div class="page-subtitle">summon or banish identities</div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">◈ SUMMON USER</div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>USERNAME</label>
+            <input id="newUsername" type="text" placeholder="cyber_id"/>
+          </div>
+          <div class="form-field">
+            <label>PASSWORD</label>
+            <input id="newPassword" type="password" placeholder="••••••••"/>
+          </div>
+          <div class="form-field">
+            <label>ROLE</label>
+            <select id="newRole">
+              <option value="member">MEMBER</option>
+              <option value="developer">DEVELOPER</option>
+            </select>
+          </div>
+          <div class="form-field" style="display:flex;align-items:flex-end;">
+            <button class="btn-12" style="width:100%" onclick="App.addUser(
+              document.getElementById('newUsername').value,
+              document.getElementById('newPassword').value,
+              document.getElementById('newRole').value)">＋ CREATE</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">◈ EXISTING ENTITIES</div>
+        <div id="userList"><div class="empty-state">[ populating ]</div></div>
+      </div>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div class="tab-content" id="tab-overview">
+      <div class="page-header">
+        <div class="page-title">📊 SYSTEM OMNI</div>
+        <div class="page-subtitle">live configuration &amp; stats</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value" id="statMembers">0</div><div class="stat-label">MEMBERS</div></div>
+        <div class="stat-card"><div class="stat-value" id="statDevs">0</div><div class="stat-label">DEVELOPERS</div></div>
+        <div class="stat-card"><div class="stat-value" id="statTokens">0</div><div class="stat-label">TOKENS</div></div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">◈ XPHANTOM CONFIG</div>
+        <table class="config-table">
+          <tr><td>Sandbox Mode</td><td id="cfgSandbox">—</td></tr>
+          <tr><td>GitHub Owner</td><td id="cfgOwner">—</td></tr>
+          <tr><td>Repository</td><td id="cfgRepo">—</td></tr>
+          <tr><td>Branch</td><td id="cfgBranch">—</td></tr>
+          <tr><td>Login Path</td><td id="cfgLoginPath">—</td></tr>
+          <tr><td>Token Path</td><td id="cfgTokenPath">—</td></tr>
+        </table>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">◈ ABOUT THE GRID</div>
+        <p style="font-family:var(--fm);font-size:.79rem;color:var(--text2);line-height:2;">
+          ⚡ <strong style="color:var(--red2)">XPHANTOM</strong> — next-gen bot management XPHANTOM.<br>
+          👑 crafted by <strong style="color:var(--gold)">FANZID OFFICIAL</strong><br>
+          🔗 GitHub as immutable backbone.
+        </p>
+      </div>
+    </div>
+  </main>
+</div><!-- end #dashboardSection -->
+
+<!-- SCRIPTS — order matters: config → sandbox → github-api → app → inline -->
+<script src="config.js"></script>
+<script src="sandbox-data.js"></script>
+<script src="github-api.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ── Cinematic intro ────────────────────────────────── */
+  const originalLogin         = App.login;
+  const originalShowDashboard = App.showDashboard;
+  let   cinematicShown        = false;
+
+  const cinematicOverlay = document.getElementById('cinematicLoading');
+  const skipBtn          = document.getElementById('skipLoadingBtn');
+  const loadingVideo     = document.getElementById('loadingVideo');
+
+  function hideCinematicAndShowDashboard () {
+    cinematicOverlay.classList.add('hidden');
+    if (loadingVideo) loadingVideo.pause();
+    originalShowDashboard.call(App);
+    cinematicShown = false;
+  }
+
+  function showCinematicLoading () {
+    if (cinematicShown) return;
+    cinematicShown = true;
+    cinematicOverlay.classList.remove('hidden');
+    if (loadingVideo) {
+      loadingVideo.play().catch(console.warn);
+      loadingVideo.onended = hideCinematicAndShowDashboard;
+    }
+    if (skipBtn) skipBtn.onclick = hideCinematicAndShowDashboard;
+  }
+
+  App.login = async function (username, password) {
+    const result = await originalLogin.call(App, username, password);
+    if (result === true || (App.currentUser && App.currentUser.username)) {
+      showCinematicLoading();
+    }
+    return result;
+  };
+
+  /* ── Render: Thanks ─────────────────────────────────── */
+  App._renderThanksTo = function () {
+    const members = this.users.filter(u => u.role === 'member').map(u => u.username);
+    const devs    = this.users.filter(u => u.role === 'developer').map(u => u.username);
+    const owner   = CONFIG.site.owner;
+    const grid    = document.getElementById('thanksGrid');
+    if (!grid) return;
+    grid.innerHTML = `
+      <div class="thanks-cat-card">
+        <div class="thanks-cat-header">
+          <span class="thanks-cat-icon">👑</span>
+          <span class="thanks-cat-title">Creator</span>
+          <span class="thanks-count">1 user</span>
+        </div>
+        <div class="thanks-names"><span class="name-chip chip-gold">${owner}</span></div>
+      </div>
+      <div class="thanks-cat-card">
+        <div class="thanks-cat-header">
+          <span class="thanks-cat-icon">🛠️</span>
+          <span class="thanks-cat-title">Developers</span>
+          <span class="thanks-count">${devs.length}</span>
+        </div>
+        <div class="thanks-names">
+          ${devs.length ? devs.map(d=>`<span class="name-chip chip-mag">${d}</span>`).join('') : '<span class="name-chip chip-empty">— none —</span>'}
+        </div>
+      </div>
+      <div class="thanks-cat-card">
+        <div class="thanks-cat-header">
+          <span class="thanks-cat-icon">💎</span>
+          <span class="thanks-cat-title">Members</span>
+          <span class="thanks-count">${members.length}</span>
+        </div>
+        <div class="thanks-names">
+          ${members.length ? members.map(m=>`<span class="name-chip chip-cyan">${m}</span>`).join('') : '<span class="name-chip chip-empty">— void —</span>'}
+        </div>
+      </div>`;
+  };
+  App.renderThanksTo = App._renderThanksTo;
+
+  /* ── Render: Tokens ─────────────────────────────────── */
+  window.maskToken = t => t.length > 15 ? t.slice(0,8)+'••••••••'+t.slice(-4) : t;
+
+  App._renderTokens = function () {
+    const list = document.getElementById('tokenList');
+    const mine = this.currentUser.role === 'developer'
+      ? this.tokens
+      : this.tokens.filter(t => t.owner === this.currentUser.username);
+    if (!mine.length) { list.innerHTML = `<div class="empty-state">[ zero tokens ]</div>`; return; }
+    list.innerHTML = mine.map(t => `
+      <div class="card-item">
+        <div class="card-item-info">
+          <span class="token-text">${maskToken(t.token)}</span>
+          <span class="owner-chip">@${t.owner}</span>
+          <span class="date-label">${t.added}</span>
+        </div>
+        <div class="card-item-actions">
+          ${App.canDeleteToken(t) ? `<button class="btn-icon-del" onclick="App.deleteToken('${t.token}')">🗑 DESTROY</button>` : ''}
+        </div>
+      </div>`).join('');
+  };
+  App.renderTokens = App._renderTokens;
+
+  /* ── Render: Users ──────────────────────────────────── */
+  App._renderUsers = function () {
+    const list = document.getElementById('userList');
+    if (!list) return;
+    list.innerHTML = this.users.map(u => `
+      <div class="card-item">
+        <div class="card-item-info">
+          <span style="font-family:var(--fm);font-weight:700">👤 ${u.username}</span>
+          <span class="role-badge">${u.role.toUpperCase()}</span>
+        </div>
+        <div class="card-item-actions">
+          ${u.username !== this.currentUser.username
+            ? `<button class="btn-icon-del" onclick="App.deleteUser('${u.username}')">🗑 BANISH</button>`
+            : `<span class="owner-chip">◈ SELF</span>`}
+        </div>
+      </div>`).join('');
+  };
+  App.renderUsers = App._renderUsers;
+
+  /* ── Role avatar ────────────────────────────────────── */
+  function updateRoleAvatar () {
+    const user = App.currentUser;
+    if (!user) return;
+    const img = document.getElementById('userAvatarImg');
+    if (!img) return;
+    let url = CONFIG.role_avatars?.member    || 'https://ar-hosting.pages.dev/1775201875905.jpg';
+    if (user.role === 'developer') url = CONFIG.role_avatars?.developer || 'https://ar-hosting.pages.dev/1775201875305.jpg';
+    img.src = url;
+  }
+
+  /* Wrap showDashboard to update avatar + ensure correct display */
+  const _origShow = App.showDashboard;
+  App.showDashboard = function () {
+    _origShow.call(App);
+    /* showDashboard in app.js typically removes .hidden from dashboardSection
+       and hides loginSection — we just make sure avatar is also updated */
+    setTimeout(updateRoleAvatar, 30);
+  };
+
+  /* ── Site config injection ──────────────────────────── */
+  if (CONFIG.site) {
+    document.getElementById('loginSiteName').textContent  = '◈ ' + CONFIG.site.name.toUpperCase();
+    document.getElementById('loginTagline').textContent   = CONFIG.site.tagline.toLowerCase();
+    document.getElementById('sidebarBrand').textContent   = '◈ ' + CONFIG.site.name.toUpperCase();
+    document.getElementById('sidebarTagline').textContent = CONFIG.site.tagline;
+    document.getElementById('siteVersion').textContent    = CONFIG.site.version;
+    document.title = CONFIG.site.name + ' · ' + CONFIG.site.tagline;
+  }
+
+  /* ── Sandbox badges ─────────────────────────────────── */
+  if (CONFIG.sandbox_mode) {
+    const badge = document.getElementById('sandboxBadge');
+    const hint  = document.getElementById('sandboxHint');
+    const c     = CONFIG.sandbox_credentials;
+    if (badge) badge.style.display = 'inline-flex';
+    if (hint) {
+      hint.style.display = 'block';
+      hint.innerHTML = `🧪 SANDBOX — use:<br>
+        <strong>DEV:</strong> ${c.developer.username} / ${c.developer.password}<br>
+        <strong>MEMBER:</strong> ${c.member.username} / ${c.member.password}`;
+    }
+    document.getElementById('dashSandboxBadge')?.classList.remove('hidden');
+  }
+
+  /* ── Tab switcher ───────────────────────────────────── */
+  window.switchTab = function (tab) {
+    App.switchTab(tab);
+    if (tab === 'overview') {
+      document.getElementById('statMembers').textContent  = App.users.filter(u=>u.role==='member').length;
+      document.getElementById('statDevs').textContent     = App.users.filter(u=>u.role==='developer').length;
+      document.getElementById('statTokens').textContent   = App.tokens.length;
+      document.getElementById('cfgSandbox').textContent   = CONFIG.sandbox_mode ? '✅ SANDBOX ACTIVE' : '❌ LIVE MODE';
+      document.getElementById('cfgOwner').textContent     = CONFIG.github.owner;
+      document.getElementById('cfgRepo').textContent      = CONFIG.github.repo;
+      document.getElementById('cfgBranch').textContent    = CONFIG.github.branch;
+      document.getElementById('cfgLoginPath').textContent = CONFIG.github.paths.login;
+      document.getElementById('cfgTokenPath').textContent = CONFIG.github.paths.tokens;
+    }
+    closeSidebar();
+  };
+
+  /* ── Login handler ──────────────────────────────────── */
+  window.handleLogin = async function () {
+    const username = document.getElementById('inputUsername').value.trim();
+    const password = document.getElementById('inputPassword').value;
+    if (!username || !password) { showToast('Enter credentials', 'error'); return; }
+    await App.login(username, password);
+  };
+
+  /* ── Toast ──────────────────────────────────────────── */
+  function showToast (msg, type = 'info') {
+    const c = document.getElementById('toastContainer');
+    if (!c) return;
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.innerText = msg;
+    c.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 450); }, 3500);
+  }
+  window.showToast = showToast;
+
+  /* ── Sidebar ────────────────────────────────────────── */
+  window.openSidebar  = () => {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('open');
+  };
+  window.closeSidebar = () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  };
+
+  /* ── Keyboard ───────────────────────────────────────── */
+  document.getElementById('inputUsername')?.addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
+  document.getElementById('inputPassword')?.addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
+
+  /* ── Theme toggle ───────────────────────────────────── */
+  document.getElementById('themeToggle')?.addEventListener('change', function () {
+    document.getElementById('themeIconLabel').textContent = this.checked ? '☀️' : '🌙';
+    document.documentElement.setAttribute('data-theme', this.checked ? 'light' : 'dark');
+  });
+
+})();
+</script>
+</body>
+</html>
