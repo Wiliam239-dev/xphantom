@@ -7,7 +7,7 @@ const CONFIG = {
   github: {
     owner: "Wiliam239-dev",
     repo: "data",
-    branch: "utama",
+    branch: "main",
     paths: {
       login: "login.json",
       tokens: "token.json"
